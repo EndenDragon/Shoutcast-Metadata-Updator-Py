@@ -20,7 +20,12 @@ def page_get():
     global botListeners, lastUpdate
     now = time.time()
     if (botListeners is None or botListeners == 0) or now - lastUpdate > 30:
-        res = etree.tostring(getMetadata())
+        meta = getMetadata()
+        #fix brackets in metadata
+        for elem in meta.xpath('/SHOUTCASTSERVER/SONGTITLE'):
+            if "[" in elem.text and (len(elem.text[elem.text.rfind('['):elem.text.rfind(']') + 1]) == 5):
+                elem.text = elem.text[:elem.text.rfind('[')]
+        res = etree.tostring(meta)
         return Response(res, mimetype='text/xml')
     else:
         meta = getMetadata()
@@ -28,6 +33,10 @@ def page_get():
             elem.text = str(int(elem.text) + int(botListeners))
         for elem in meta.xpath('/SHOUTCASTSERVER/UNIQUELISTENERS'):
             elem.text = str(int(elem.text) + int(botListeners))
+        #fix brackets in metadata
+        for elem in meta.xpath('/SHOUTCASTSERVER/SONGTITLE'):
+            if "[" in elem.text and (len(elem.text[elem.text.rfind('['):elem.text.rfind(']') + 1]) == 5):
+                elem.text = elem.text[:elem.text.rfind('[')]
         res = etree.tostring(meta)
         return Response(res, mimetype='text/xml')
 
