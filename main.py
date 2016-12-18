@@ -12,8 +12,7 @@ lastUpdate = 0
 def getMetadata():
     p = requests.get(config['shoutcast-metadata-url'])
     parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
-    #x = etree.fromstring(str(p.text), parser=parser)
-    x = etree.fromstring(str(test), parser=parser)
+    x = etree.fromstring(str(p.text), parser=parser)
     return x
 
 @app.route("/", methods=['GET'])
