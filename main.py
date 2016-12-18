@@ -12,7 +12,8 @@ lastUpdate = 0
 def getMetadata():
     p = requests.get(config['shoutcast-metadata-url'])
     parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
-    x = etree.fromstring(str(p.text), parser=parser)
+    #x = etree.fromstring(str(p.text), parser=parser)
+    x = etree.fromstring(str(test), parser=parser)
     return x
 
 @app.route("/", methods=['GET'])
@@ -23,19 +24,21 @@ def page_get():
         meta = getMetadata()
         #fix brackets in metadata
         for elem in meta.xpath('/SHOUTCASTSERVER/SONGTITLE'):
-            if "[" in elem.text and (len(elem.text[elem.text.rfind('['):elem.text.rfind(']') + 1]) == 5):
+            if elem.text is not None and "[" in elem.text and (len(elem.text[elem.text.rfind('['):elem.text.rfind(']') + 1]) == 5):
                 elem.text = elem.text[:elem.text.rfind('[')]
         res = etree.tostring(meta)
         return Response(res, mimetype='text/xml')
     else:
         meta = getMetadata()
         for elem in meta.xpath('/SHOUTCASTSERVER/CURRENTLISTENERS'):
-            elem.text = str(int(elem.text) + int(botListeners))
+            if elem.text is not None:
+                elem.text = str(int(elem.text) + int(botListeners))
         for elem in meta.xpath('/SHOUTCASTSERVER/UNIQUELISTENERS'):
-            elem.text = str(int(elem.text) + int(botListeners))
+            if elem.text is not None:
+                elem.text = str(int(elem.text) + int(botListeners))
         #fix brackets in metadata
         for elem in meta.xpath('/SHOUTCASTSERVER/SONGTITLE'):
-            if "[" in elem.text and (len(elem.text[elem.text.rfind('['):elem.text.rfind(']') + 1]) == 5):
+            if elem.text is not None and "[" in elem.text and (len(elem.text[elem.text.rfind('['):elem.text.rfind(']') + 1]) == 5):
                 elem.text = elem.text[:elem.text.rfind('[')]
         res = etree.tostring(meta)
         return Response(res, mimetype='text/xml')
