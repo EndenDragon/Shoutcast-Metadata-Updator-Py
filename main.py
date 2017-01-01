@@ -3,6 +3,7 @@ from database import db, Properties
 from flask import Flask, Response, g, redirect, request, url_for
 from lxml import etree
 import datetime
+import logging
 import requests
 import time
 
@@ -12,6 +13,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = config['DATABASE_URI']
 app.config['SQLALCHEMY_POOL_RECYCLE'] = 250
 
 db.init_app(app)
+
+# Disable HTTP Connection messages from requests
+logging.getLogger("requests").setLevel(logging.WARNING)
 
 def getMetadata():
     p = requests.get(config['shoutcast-metadata-url'])
