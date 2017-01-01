@@ -9,6 +9,7 @@ import time
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = config['DATABASE_URI']
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 250
 
 db.init_app(app)
 
