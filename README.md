@@ -3,5 +3,6 @@ Update the listeners count for shoutcast metadata.
 
 ## Pip requirements:
 - Flask
+- Flask-SQLAlchemy
 - lxml
 - requests
