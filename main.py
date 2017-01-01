@@ -15,8 +15,9 @@ db.init_app(app)
 
 def getMetadata():
     p = requests.get(config['shoutcast-metadata-url'])
+    utf = u''.join(p.text).encode('utf-8')
     parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
-    x = etree.fromstring(str(p.text), parser=parser)
+    x = etree.fromstring(utf, parser=parser)
     return x
 
 def getBotListeners():
