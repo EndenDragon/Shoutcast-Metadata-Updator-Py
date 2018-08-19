@@ -1,18 +1,16 @@
 from config import config
-from database import db, Properties
-from flask import Flask, Response, g, redirect, request, url_for
+from flask import Flask, Response, redirect, request, url_for
+from flask_redis import FlaskRedis
 from lxml import etree
-import datetime
 import logging
 import requests
 import time
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = config['DATABASE_URI']
-app.config['SQLALCHEMY_POOL_RECYCLE'] = 250
 
-db.init_app(app)
+app.config['REDIS_URL'] = config["redis-uri"]
+redis_store = FlaskRedis(charset="utf-8", decode_responses=True)
+redis_store.init_app(app)
 
 # Disable HTTP Connection messages from requests
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -25,40 +23,22 @@ def getMetadata():
     return x
 
 def getBotListeners():
-    q = Properties.query.filter_by(name='botListeners').first()
-    if q is None:
-        prop = Properties(name="botListeners", value="0")
-        db.session.add(prop)
-        db.session.commit()
-        q = Properties.query.filter_by(name='botListeners').first()
-    return int(q.value)
+    value = redis_store.get("shoutcast/botListeners")
+    if not value:
+        value = 0
+    return int(value)
 
 def setBotListeners(value):
-    q = Properties.query.filter_by(name='botListeners').first()
-    if q is None:
-        prop = Properties(name="botListeners", value=str(value))
-        db.session.add(prop)
-    else:
-        q.value = str(value)
-    db.session.commit()
+    redis_store.set("shoutcast/botListeners", value)
 
 def getLastUpdate():
-    q = Properties.query.filter_by(name='lastUpdate').first()
-    if q is None:
-        prop = Properties(name="lastUpdate", value="0")
-        db.session.add(prop)
-        db.session.commit()
-        q = Properties.query.filter_by(name='lastUpdate').first()
-    return float(q.value)
+    value = redis_store.get("shoutcast/lastUpdate")
+    if not value:
+        value = 0
+    return float(value)
 
 def setLastUpdate(value):
-    q = Properties.query.filter_by(name='lastUpdate').first()
-    if q is None:
-        prop = Properties(name="lastUpdate", value=str(value))
-        db.session.add(prop)
-    else:
-        q.value = str(value)
-    db.session.commit()
+    redis_store.set("shoutcast/lastUpdate", str(value))
 
 @app.route("/", methods=['GET'])
 def page_get():

@@ -1,8 +1,2 @@
-# Shoutcast Metadata Updater [Python 2.7]
+# Shoutcast Metadata Updater [Python 3.5+]
 Update the listeners count for shoutcast metadata.
-
-## Pip requirements:
-- Flask
-- Flask-SQLAlchemy
-- lxml
-- requests
